@@ -4,7 +4,7 @@ const schedule = require('node-schedule');
 const discord = require('./dhook')
 const teams = require('./thook')
 
-const csvFilePath = 'settings.csv';
+const csvFilePath = './settings.csv';
 const columns = {};
 
 // Function to process the CSV data
@@ -44,7 +44,40 @@ function rotateArrayByOne(arr) {
   return arr;
 }
 
-// Schedule the task to run every Saturday at midnight
+// Log a message when the script starts
+console.log('Script is running...');
+
+// You can also perform the initial task when the script starts
+processCsvData();
+
+// Notify endpoints
+discord.sendMessageToServer('Bot is online and functional!')
+
+// Create reminder CRONs
+columns.Reminder.forEach(reminder => {
+  // Regular expression to match the format
+  const regex = /<([^>]+)>(\d{2}):(\d{2})/;
+
+  // Match the input string with the regular expression
+  const match = reminder.match(regex);
+
+  // Check if the match is found
+  if (match) {
+    // Extracted values
+    const rawText = match[1]; // The raw text inside <>
+    const hour = parseInt(match[2], 10); // Convert hour to integer
+    const minute = parseInt(match[3], 10); // Convert minute to integer
+
+    // Output the results
+    console.log("Raw Text:", rawText);
+    console.log("Hour:", hour);
+    console.log("Minute:", minute);
+  } else {
+    console.log("Invalid format");
+  }
+});
+
+// Schedule the task to run every Sunday at midnight
 const j = schedule.scheduleJob('0 0 * * 7', () => {
   console.log("Running scheduled task...")
   var weekly = columns.Weekly
@@ -57,10 +90,3 @@ const j = schedule.scheduleJob('0 0 * * 7', () => {
   //teams.sendMessageToTeam('')
   columns.Weekly = rotateArrayByOne(weekly)
 });
-
-// Log a message when the script starts
-console.log('Script is running...');
-
-// You can also perform the initial task when the script starts
-processCsvData();
-discord.sendMessageToServer('Bot is online and functional!')
