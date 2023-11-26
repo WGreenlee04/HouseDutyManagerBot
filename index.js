@@ -1,43 +1,32 @@
-// Import the PapaParse library
-import Papa from 'papaparse';
+const fs = require('fs');
+const csv = require('csv-parser');
 
-// Function to handle the CSV parsing and 2D array creation
-function parseCSV(csvData) {
-  return new Promise((resolve, reject) => {
-    Papa.parse(csvData, {
-      header: true, // Set to true if the CSV has a header row
-      complete: (result) => {
-        resolve(result.data);
-      },
-      error: (error) => {
-        reject(error.message);
-      },
-    });
-  });
-}
+const csvFilePath = 'settings.csv';
+const columns = {};
 
-// Function to read the "settings.csv" file and trigger the parsing
-function readSettingsCSV() {
-  return new Promise((resolve, reject) => {
-    const fileName = 'settings.csv';
+fs.createReadStream(csvFilePath)
+  .pipe(csv())
+  .on('data', (row) => {
+    // Process each row of the CSV file
+    for (const [key, value] of Object.entries(row)) {
+      if (!columns[key]) {
+        columns[key] = [];
+      }
 
-    fetch(fileName)
-      .then((response) => response.text())
-      .then((csvData) => {
-        parseCSV(csvData)
-          .then((data) => resolve(data))
-          .catch((error) => reject(error));
-      })
-      .catch((error) => reject(error.message));
-  });
-}
-
-// Example usage
-readSettingsCSV()
-  .then((data) => {
-    console.log('CSV Data:', data);
-    // Do something with the 2D array data
+      // Filter out empty values
+      if (value !== '') {
+        columns[key].push(value);
+      }
+    }
   })
-  .catch((error) => {
-    console.error('Error:', error);
+  .on('end', () => {
+    // Finished reading the CSV file
+    console.log('Data read successfully:');
+    console.log(columns);
+
+    // You can now use the 'columns' object where each key is a column name, and the value is an array of non-empty values for that column
+  })
+  .on('error', (error) => {
+    // Handle any errors that occurred during the reading process
+    console.error('Error reading CSV file:', error.message);
   });
