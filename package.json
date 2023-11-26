@@ -1,0 +1,14 @@
+{
+  "name": "HouseDutyManagerBot",
+  "version": "1.0.0",
+  "description": "LCA house duty announcement manager. Keeps the pebians in-line",
+  "main": "index.js",
+  "repository": "https://github.com/WGreenlee04/HouseDutyManagerBot.git",
+  "author": "William Greenlee (TK 1836)",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "papaparse": "^5.4.1"
+  }
+}
